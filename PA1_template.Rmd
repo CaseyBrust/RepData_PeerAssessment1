@@ -7,19 +7,52 @@ output:
 
 
 ## Loading and preprocessing the data
-
-
+```{r}
+rawdata <- read.csv("activity.csv",na.strings = "NA")
+```
 
 ## What is mean total number of steps taken per day?
+For this part of the assignment, we ignore the missing values in the dataset.
 
+1. Calculate the **total** number of steps per day
+```{r}
+stepsperday <- aggregate(steps ~ date,rawdata,sum)
+```
 
+2. Make a **histogram** of the total number of steps taken each day.
+```{r}
+hist(stepsperday$steps, breaks=10, main="Total Steps per Day", xlab="Steps per Day", ylim=c(0,20), xlim=c(0,25000))
+```
+
+3. Calculate and report the **mean** and **median** of the total number of steps taken per day.
+```{r}
+mean(stepsperday$steps,na.rm=TRUE)
+median(stepsperday$steps,na.rm=TRUE)
+```
 
 ## What is the average daily activity pattern?
+1. Make a time series plot of the 5-minute interval and the average number of steps taken, averaged across all days.
+```{r}
+stepsperinterval <- aggregate (steps ~ interval,rawdata,mean,na.rm=TRUE)
+plot(stepsperinterval$steps ~ stepsperinterval$interval, type="l", main= "Average Steps per Interval", xlab="Interval",ylab="Average Steps")
+```
 
-
+2. Which 5-minute interval, on average across all the days in the dataset, contains the maxiumum number of steps?
+```{r}
+stepsperinterval[which.max(stepsperinterval$steps),]
+```
 
 ## Imputing missing values
+1. Calculate and report the total number of missing values in the dataset (i.e. the total number of rows with NAs).
+```{r}
+sum(!complete.cases(rawdata))
+```
 
+2. Devise a strategy for filling in all of the missing values in the dataset: use interval mean.
 
-
+3. Create a new datase that is equal to the original dataset but with the missing data filled in.
+```{r}
+data2 <-rawdata
+data2[is.na(data2$steps),] <- tapply(data2$steps,data2$interval,mean,na.rm=TRUE)[data2[is.na(data2$steps),]]
+```
 ## Are there differences in activity patterns between weekdays and weekends?
